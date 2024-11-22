@@ -161,10 +161,18 @@ public class GetLocation {
 
     private boolean isLocationEnabled() {
         try {
-            return locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER) ||
-                    locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER);
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+                // Para Android 9 (Pie) y superior
+                return locationManager.isLocationEnabled();
+            } else {
+                // Para versiones anteriores a Android 9
+                return locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER) ||
+                        locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER);
+            }
+        } catch (SecurityException ex) {
+            Log.e("GetLocation", "Permission issue: " + ex.getMessage(), ex);
         } catch (Exception ex) {
-            ex.printStackTrace();
+            Log.e("GetLocation", "Error checking location enabled status: " + ex.getMessage(), ex);
         }
         return false;
     }
